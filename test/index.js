@@ -3,8 +3,7 @@ require('babel-register')({
 })
 require('babel-polyfill')
 
-const IndexedDBWrapper = require('./../src/indexeddbWrapper.js')
-debugger;
+const IndexedDBWrapper = require('./../src/indexeddbWrapper.js').default
 IndexedDBWrapper.initialize(function() {
   console.log('完成')
 })
@@ -20,6 +19,6 @@ try {
   IndexedDBWrapper.add({ id: 7 })
 } catch (e) {}
 
-window.onerror = function() {
+process.on('uncaughtException', function() {
   IndexedDBWrapper.print()
-}
+})

@@ -7,8 +7,8 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "启动程序",
-      "program": "${workspaceFolder}/src/app.js"
+      "name": "Debug",
+      "program": "${workspaceFolder}/test/index.js"
     }
   ]
 }
