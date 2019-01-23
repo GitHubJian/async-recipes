@@ -21,8 +21,5 @@
     "url": "https://github.com/GitHubJian/async-recipes/issues"
   },
   "homepage": "https://github.com/GitHubJian/async-recipes#readme",
-  "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0"
-  }
+  "dependencies": {}
 }

@@ -1,4 +1,4 @@
-import IndexedDBWrapper from './indexedDBWrapper.js'
+const IndexedDBWrapper = require('./indexedDBWrapper.js')
 
 IndexedDBWrapper.initialize(function() {
   console.log('完成')
@@ -13,8 +13,6 @@ try {
   IndexedDBWrapper.add({ id: 5 })
   IndexedDBWrapper.add({ id: 6 })
   IndexedDBWrapper.add({ id: 7 })
-} catch (e) {}
-
-window.onerror = function() {
+} catch (e) {
   IndexedDBWrapper.print()
 }

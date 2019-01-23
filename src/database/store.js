@@ -1,39 +1,41 @@
-import events from './../events.js'
-import carrier from './carrier.js'
-import Request from './request.js'
+'use strict'
+;(function webpack(global, factory) {
+  if (typeof exports === 'object' && typeof module === 'object') {
+    module.exports = factory()
+  } else if (typeof define === 'function' && define.amd) {
+    define([], factory())
+  } else if (typeof exports === 'function') {
+    exports['Store'] = factory()
+  } else {
+    global['Store'] = factory()
+  }
+})(this, function() {
+  const Carrier = require('./carrier.js')
+  const Request = require('./request.js')
 
-export default class Store extends events.EventEmitter {
-  constructor() {
-    super()
+  class Store extends Request {
+    constructor() {
+      super()
+    }
 
-    Object.defineProperty(this, 'onsuccess', {
-      set(val) {
-        this.on('success', val)
-      }
-    })
+    add(obj) {
+      let that = this
 
-    Object.defineProperty(this, 'onerror', {
-      set(val) {
-        this.on('error', val)
-      }
-    })
+      setTimeout(function() {
+        Carrier.push(
+          obj,
+          function() {
+            that.emit('success', arguments)
+          },
+          function() {
+            that.emit('error', arguments)
+          }
+        )
+      }, 1e3)
+
+      return this
+    }
   }
 
-  add(obj) {
-    let request = new Request()
-
-    setTimeout(function() {
-      carrier.push(
-        obj,
-        function() {
-          request.emit('success', arguments)
-        },
-        function() {
-          request.emit('error', arguments)
-        }
-      )
-    }, 1e3)
-
-    return request
-  }
-}
+  return Store
+})

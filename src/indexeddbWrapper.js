@@ -1,53 +1,65 @@
-import IndexedDB from './indexeddb.js'
-
-let indexedDB = new IndexedDB()
-let activeState // 当前状态
-let initializedState = indexedDB
-
-class Command {
-  constructor(command, args) {
-    this.command = command
-    this.args = args
+'use strict'
+;(function webpack(global, factory) {
+  if (typeof exports === 'object' && typeof module === 'object') {
+    module.exports = factory()
+  } else if (typeof define === 'function' && define.amd) {
+    define([], factory())
+  } else if (typeof exports === 'function') {
+    exports['IndexedDB'] = factory()
+  } else {
+    global['IndexedDB'] = factory()
   }
-}
+})(this, function() {
+  const IndexedDB = require('./indexeddb.js')
 
-let IndexedDBWrapper = {
-  initialized: false,
-  initialize: function() {
-    activeState.initialize.apply(activeState, arguments)
-  },
-  add: function() {
-    activeState.add.apply(activeState, arguments)
-  },
-  print: function() {
-    activeState.add.apply(activeState, arguments)
+  let indexedDB = new IndexedDB()
+  let activeState // 当前状态
+  let initializedState = indexedDB
+
+  class Command {
+    constructor(command, args) {
+      this.command = command
+      this.args = args
+    }
   }
-}
 
-let pending = []
-let notInitializedState = {
-  initialize: function(callback) {
-    indexedDB.initialize(function() {
-      IndexedDBWrapper.initialized = true
-      activeState = initializedState
+  let IndexedDBWrapper = {
+    initialized: false
+  }
 
-      pending.forEach(function({ command, args }) {
-        indexedDB[command].apply(null, args)
+  let pending = []
+  let notInitializedState = {
+    initialize: function(callback) {
+      indexedDB.initialize(function() {
+        IndexedDBWrapper.initialized = true
+        activeState = initializedState
+
+        pending.forEach(function({ command, args }) {
+          indexedDB[command].apply(null, args)
+        })
+
+        pending = []
+
+        callback && callback()
       })
-
-      pending = []
-
-      callback && callback()
-    })
-  },
-  add() {
-    return pending.push(new Command('add', arguments))
-  },
-  print() {
-    return pending.push(new Command('print', arguments))
+    }
   }
-}
 
-activeState = notInitializedState
+  Object.getOwnPropertyNames(IndexedDB.prototype).forEach(p => {
+    if (p !== 'constructor') {
+      IndexedDBWrapper[p] = function() {
+        activeState[p].apply(activeState, arguments)
+      }
 
-export default IndexedDBWrapper
+      if (p !== 'initialize') {
+        notInitializedState[p] = function() {
+          return pending.push(new Command(p, arguments))
+        }
+      }
+    }
+  })
+
+  activeState = notInitializedState
+
+  return IndexedDBWrapper
+})

@@ -1,9 +1,5 @@
-require('babel-register')({
-  presets: ['env']
-})
-require('babel-polyfill')
+const IndexedDBWrapper = require('./../src/indexeddbWrapper.js')
 
-const IndexedDBWrapper = require('./../src/indexeddbWrapper.js').default
 IndexedDBWrapper.initialize(function() {
   console.log('完成')
 })
